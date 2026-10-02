@@ -35,5 +35,5 @@ CREATE TABLE IF NOT EXISTS `Abogados` (
 ALTER TABLE `Causas` ADD CONSTRAINT `Causas_fk5` FOREIGN KEY (`idDemandante`) REFERENCES `Personas`(`idPersona`);
 ALTER TABLE `Causas` ADD CONSTRAINT `Causas_fk6` FOREIGN KEY (`idDemandado`) REFERENCES `Personas`(`idPersona`);
 ALTER TABLE `Causas` ADD CONSTRAINT `Causas_fk7` FOREIGN KEY (`idAbogado`) REFERENCES `Abogados`(`idMatricula`);
-ALTER TABLE `Documentos` ADD CONSTRAINT `Documentos_fk1` FOREIGN KEY (`idCausa`) REFERENCES `Causas`(`idCausa`);
+ALTER TABLE `Documentos` ADD CONSTRAINT `Documentos_fk1` FOREIGN KEY (`idCausa`) REFERENCES `Causas`(`idCausa`) ON DELETE CASCADE;
 ALTER TABLE `Abogados` ADD CONSTRAINT `Abogados_fk1` FOREIGN KEY (`idPersona`) REFERENCES `Personas`(`idPersona`);
