@@ -2,7 +2,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -13,12 +12,12 @@ public class Main extends Application{
     public void start(Stage stage){
         FXMLLoader loader = new FXMLLoader(getClass().getResource("login.fxml"));
         Parent root = null;
-        try {
+        try { //TODO
             root = loader.load();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        Scene scene = new Scene(root, 1000, 1000);
+        Scene scene = new Scene(root, 600, 400);
         stage.setScene(scene);
         stage.setTitle("Gestor de Causas <La Ley>");
         stage.show();

@@ -17,12 +17,12 @@ public class consulta {
             try {
                 conexion = DriverManager.getConnection(urls[a],usuario,contraseña);
                 estadoConexion = true;
-                //System.out.println("Conexion exitosa"); //diagnostico
+                System.out.println("Conexion exitosa"); //diagnostico
 
                 break; //conexion exitosa, no hace falta probar la otra URL
             } catch (SQLException e) {
                 estadoConexion = false;
-                //System.out.println("Falló conexion con: " + urls[a] ); //diagnostico
+                System.out.println("Falló conexion con: " + urls[a] ); //diagnostico
 
             }//fin try-catch
         }//fin for
@@ -32,6 +32,35 @@ public class consulta {
     }//fin constructor
 
     public boolean getEstadoConexion() { return estadoConexion; }
+
+    //TODO
+    public void consultar(String nombre){
+        //consulta SQL
+        String query = "SELECT C.idCausa, C.nExpediente, ND.nombre AS Demandante, NDM.nombre AS Demandado, NA.nombre AS Abogado" +
+                " FROM Causas C JOIN Personas ND ON C.idDemandante = ND.idPersona" +
+                                " JOIN Personas NDM ON C.idDemandado = NDM.idPersona" +
+                                " JOIN Abogados A ON C.idAbogado = A.idMatricula" +
+                                " JOIN Personas NA ON A.idPersona = NA.idPersona" +
+                " WHERE ND.nombre LIKE ? OR ND.apellido LIKE ?" +
+                " OR NDM.nombre LIKE ? OR NDM.apellido LIKE ?" +
+                " OR NA.nombre LIKE ? OR NA.apellido LIKE ?";
+        try {
+            PreparedStatement statement = conexion.prepareStatement(query);
+            String nombreBuscado = "%"+nombre+"%"; //preparamos nombre
+            statement.setString(1, nombreBuscado); statement.setString(2, nombreBuscado);
+            statement.setString(3, nombreBuscado); statement.setString(4, nombreBuscado);
+            statement.setString(4, nombreBuscado); statement.setString(6, nombreBuscado);
+
+            //recibimos las tuplas resultantes
+            ResultSet resultados = statement.executeQuery();
+        }catch (SQLException e) {
+
+        }
+        //TODO
+
+
+    }//fin consultar
+
 //TODO
     public void crearCausa(){ //
 
@@ -53,14 +82,14 @@ public class consulta {
         String query = "DELETE FROM "+tabla+" WHERE idCausa = ?";
         try {
             PreparedStatement statement = conexion.prepareStatement(query);
-            statement.setInt(1,idCausa); //.setInt(posicion a reemplazar, valor a usar)
+            statement.setInt(1,idCausa); //.setInt(posición a reemplazar, valor a usar)
 
             //resultado de la query
             int respuesta = statement.executeUpdate(); //Update nos dice cuantas tablas fueron afectadas
 
             System.out.println("Borrado exitoso!"); //diagnostico
 
-            return (respuesta > 0); //si la comparacion da TRUE o FALSE sabemos si una o mas tuplas fueron afectadas o no
+            return (respuesta > 0); //si la comparación da TRUE o FALSE sabemos si una o mas tuplas fueron afectadas o no
         } catch (SQLException e) {
 
             System.out.println("No se pudo realizar el borrado: " + e.getMessage()); //diagnostico
@@ -69,10 +98,5 @@ public class consulta {
             //es garantia que si ocurre una exepcion no se borró nada
         }//fin try-catch
     }//fin borrarCausa
-
-    //TODO
-    public void consultar(){
-
-    }//fin consultar
 
 }//fin consulta

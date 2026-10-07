@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ContextMenu?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
@@ -11,25 +10,18 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+<SplitPane dividerPositions="0.29797979797979796" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mainMenu">
   <items>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
             <Label layoutX="38.0" layoutY="14.0" prefHeight="36.0" prefWidth="102.0" text="Gestor de Causas La Ley" textAlignment="CENTER" wrapText="true" />
-            <TextField layoutX="13.0" layoutY="74.0" promptText="Buscar la base de datos">
-               <contextMenu>
-                  <ContextMenu fx:id="buscarContext">
-                    <items>
-                      <MenuItem fx:id="buscarMenuItem" mnemonicParsing="false" text="Buscar en base de datos" />
-                    </items>
-                  </ContextMenu>
-               </contextMenu>
+            <TextField fx:id="campoBusqueda" layoutX="13.0" layoutY="74.0" onAction="#buscar" promptText="Buscar la base de datos">
                <tooltip>
                   <Tooltip text="Ingrese el nombre a buscar" wrapText="true" />
                </tooltip>
             </TextField>
             <Line endX="494.0" layoutX="104.0" layoutY="61.0" startX="-105.0" />
-            <MenuButton fx:id="registrar" alignment="CENTER" layoutX="8.0" layoutY="107.0" mnemonicParsing="false" prefHeight="68.0" prefWidth="160.0" text="Nuevo Registro">
+            <MenuButton fx:id="menuRegistrar" alignment="CENTER" layoutX="8.0" layoutY="107.0" mnemonicParsing="false" prefHeight="68.0" prefWidth="160.0" text="Nuevo Registro">
               <items>
                 <MenuItem fx:id="nuevaCausa" mnemonicParsing="false" text="Registrar Causa" />
                 <MenuItem fx:id="nuevaPersona" mnemonicParsing="false" text="Registrar Persona" />
@@ -39,7 +31,7 @@
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>
             <Line endX="308.0" layoutX="115.0" layoutY="60.0" startX="-126.0" />
-            <ListView layoutY="60.0" prefHeight="338.0" prefWidth="417.0" />
+            <ListView fx:id="listaView" layoutY="60.0" prefHeight="338.0" prefWidth="417.0" />
          </children></AnchorPane>
   </items>
 </SplitPane>
