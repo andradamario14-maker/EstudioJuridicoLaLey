@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 
 // TODO documentación para JDBC "https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html"
 public class consulta {
@@ -22,8 +23,7 @@ public class consulta {
                 break; //conexion exitosa, no hace falta probar la otra URL
             } catch (SQLException e) {
                 estadoConexion = false;
-                System.out.println("Falló conexion con: " + urls[a] ); //diagnostico
-
+                System.out.println(e + "\nFalló conexion con: " + urls[a] ); //diagnostico
             }//fin try-catch
         }//fin for
 
@@ -33,14 +33,14 @@ public class consulta {
 
     public boolean getEstadoConexion() { return estadoConexion; }
 
-    //TODO
-    public void consultar(String nombre){
+
+    public ArrayList<String> consultar(String nombre){
         //consulta SQL
         String query = "SELECT C.idCausa, C.nExpediente, ND.nombre AS Demandante, NDM.nombre AS Demandado, NA.nombre AS Abogado" +
-                " FROM Causas C JOIN Personas ND ON C.idDemandante = ND.idPersona" +
-                                " JOIN Personas NDM ON C.idDemandado = NDM.idPersona" +
-                                " JOIN Abogados A ON C.idAbogado = A.idMatricula" +
-                                " JOIN Personas NA ON A.idPersona = NA.idPersona" +
+                " FROM Causas C JOIN Personas ND ON C.idDemandante = ND.idPersona" + //ND Nombre Demandante
+                                " JOIN Personas NDM ON C.idDemandado = NDM.idPersona" + //NDM NombreDeMandado
+                                " JOIN Abogados A ON C.idAbogado = A.idMatricula" + //A Abogado
+                                " JOIN Personas NA ON A.idPersona = NA.idPersona" + //NA Nombre Abogado
                 " WHERE ND.nombre LIKE ? OR ND.apellido LIKE ?" +
                 " OR NDM.nombre LIKE ? OR NDM.apellido LIKE ?" +
                 " OR NA.nombre LIKE ? OR NA.apellido LIKE ?";
@@ -49,16 +49,28 @@ public class consulta {
             String nombreBuscado = "%"+nombre+"%"; //preparamos nombre
             statement.setString(1, nombreBuscado); statement.setString(2, nombreBuscado);
             statement.setString(3, nombreBuscado); statement.setString(4, nombreBuscado);
-            statement.setString(4, nombreBuscado); statement.setString(6, nombreBuscado);
+            statement.setString(5, nombreBuscado); statement.setString(6, nombreBuscado);
 
             //recibimos las tuplas resultantes
+            ArrayList<String> results = new ArrayList<>();
             ResultSet resultados = statement.executeQuery();
+            //las volvemos un objeto de  java, será manejado por la funcion que lo llamó
+
+            while(resultados.next()){
+                String tupla = resultados.getString("nExpediente")
+                        + " | " + resultados.getString("Demandante")
+                        + " vs " + resultados.getString("Demandado");
+                results.add(tupla);
+            }
+            resultados.close(); //realizar muchas consultas terminaba con una falta de recursos, hay que cerrarlos
+            statement.close();
+
+            return results;
         }catch (SQLException e) {
-
-        }
-        //TODO
-
-
+            System.out.println("Error: "+ e.getMessage()); //diagnostico
+            //en caso de que haya fallado, retornamos null
+            return null;
+        }//fin try-catch
     }//fin consultar
 
 //TODO
@@ -70,7 +82,7 @@ public class consulta {
 
     }//fin editarCausa
 
-    //TODO https://docs.oracle.com/javase/tutorial/jdbc/basics/prepared.html
+    // https://docs.oracle.com/javase/tutorial/jdbc/basics/prepared.html
     public boolean borrar(String tabla,int idCausa){
         //Comprobar que la tabla a borrar es valida
         if( !tabla.equals("Causas") && !tabla.equals("Documentos") ){
@@ -84,9 +96,10 @@ public class consulta {
             PreparedStatement statement = conexion.prepareStatement(query);
             statement.setInt(1,idCausa); //.setInt(posición a reemplazar, valor a usar)
 
+
             //resultado de la query
             int respuesta = statement.executeUpdate(); //Update nos dice cuantas tablas fueron afectadas
-
+            statement.close(); //cerramos
             System.out.println("Borrado exitoso!"); //diagnostico
 
             return (respuesta > 0); //si la comparación da TRUE o FALSE sabemos si una o mas tuplas fueron afectadas o no
