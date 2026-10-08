@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
@@ -24,9 +25,10 @@
             <MenuButton fx:id="menuRegistrar" alignment="CENTER" layoutX="8.0" layoutY="107.0" mnemonicParsing="false" prefHeight="68.0" prefWidth="160.0" text="Nuevo Registro">
               <items>
                 <MenuItem fx:id="nuevaCausa" mnemonicParsing="false" text="Registrar Causa" />
-                <MenuItem fx:id="nuevaPersona" mnemonicParsing="false" text="Registrar Persona" />
+                <MenuItem fx:id="nuevaPersona" mnemonicParsing="false" onAction="#crearPersona" text="Registrar Persona" />
               </items>
             </MenuButton>
+            <Button fx:id="botonVolverLogin" layoutX="12.0" layoutY="359.0" mnemonicParsing="false" onAction="#volverAlogIn" text="Volver" />
          </children></AnchorPane>
     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
          <children>

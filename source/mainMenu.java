@@ -1,9 +1,14 @@
 import javafx.fxml.FXML;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class mainMenu {
 
@@ -13,7 +18,7 @@ public class mainMenu {
     @FXML private ListView<String> listaResultados;
 
     //metodos
-    public void buscar(){
+    public void buscar(){ //se recibe la entrada de la barra de busqueda y retorna resultados
         String nombre = campoBusqueda.getText();
         ArrayList<String> resultados = conexion.consultar(nombre);
         if (resultados == null) {
@@ -24,4 +29,28 @@ public class mainMenu {
         listaResultados.getItems().addAll(resultados);
     }//fin buscar
 
+    public void crearPersona(){ //mostramos ventana emergente con el formulario de crear persona
+        FXMLLoader  loader = new FXMLLoader(getClass().getResource("persona.fxml"));
+        try {
+            Parent root = loader.load();
+            Stage ventanaEmergente = new Stage();
+            ventanaEmergente.setTitle("Registrar Nueva Persona");
+            Scene scene = new Scene(root);
+            ventanaEmergente.setScene(scene);
+            ventanaEmergente.show();
+
+        } catch (IOException e){
+            System.out.println("Error : "+e.getMessage());
+        }//fin try-catch
+
+
+    }//fin crearPersona
+
+
+    //TODO AÑADIR UN BOTON QUE TE DEJE REGRESAR A LA PANTALLA DE LOG-IN PARA CAMBIAR DE CUENTA
+
+    public void volverAlogIn(){
+        //TODO  DEBERÁ TERMINAR LA CONEXION ACTUAL CON LA DB PARA ENTONCES CREAR UNA NUEVA CUANDO SE REALIZE EL NUEVO LOG-IN
+
+    }//fin volverAlogIn
 }//fin mainMenu

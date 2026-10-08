@@ -1,14 +1,14 @@
 import java.sql.*;
 import java.util.ArrayList;
 
-// TODO documentación para JDBC "https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html"
+// documentación para JDBC "https://docs.oracle.com/javase/tutorial/jdbc/basics/connecting.html"
 public class consulta {
 
     //variables
     private Connection conexion; //objeto para interactuar con la base de datos
     private boolean estadoConexion; //se usa para mostrar mensajes de error
 
-    //iniciar la conexion con la base de datos mediante el constructor
+    //constructor, iniciar la conexion con la base de datos
     public consulta(String usuario,String contraseña) {
 
         //lista de URLs (se prueba primero si el sistema es host de la base de datos)
@@ -23,7 +23,7 @@ public class consulta {
                 break; //conexion exitosa, no hace falta probar la otra URL
             } catch (SQLException e) {
                 estadoConexion = false;
-                System.out.println(e + "\nFalló conexion con: " + urls[a] ); //diagnostico
+                System.out.println(e.getMessage() + "\nFalló conexion con: " + urls[a] ); //diagnostico
             }//fin try-catch
         }//fin for
 
@@ -33,7 +33,7 @@ public class consulta {
 
     public boolean getEstadoConexion() { return estadoConexion; }
 
-
+    //SELECT
     public ArrayList<String> consultar(String nombre){
         //consulta SQL
         String query = "SELECT C.idCausa, C.nExpediente, ND.nombre AS Demandante, NDM.nombre AS Demandado, NA.nombre AS Abogado" +
@@ -47,9 +47,9 @@ public class consulta {
         try {
             PreparedStatement statement = conexion.prepareStatement(query);
             String nombreBuscado = "%"+nombre+"%"; //preparamos nombre
-            statement.setString(1, nombreBuscado); statement.setString(2, nombreBuscado);
-            statement.setString(3, nombreBuscado); statement.setString(4, nombreBuscado);
-            statement.setString(5, nombreBuscado); statement.setString(6, nombreBuscado);
+            statement.setString(1, nombreBuscado); statement.setString(2, nombreBuscado);//ND
+            statement.setString(3, nombreBuscado); statement.setString(4, nombreBuscado);//NDM
+            statement.setString(5, nombreBuscado); statement.setString(6, nombreBuscado);//NA
 
             //recibimos las tuplas resultantes
             ArrayList<String> results = new ArrayList<>();
@@ -63,7 +63,7 @@ public class consulta {
                 results.add(tupla);
             }
             resultados.close(); //realizar muchas consultas terminaba con una falta de recursos, hay que cerrarlos
-            statement.close();
+            statement.close(); //https://www.geeksforgeeks.org/java/how-to-use-preparedstatement-in-java/
 
             return results;
         }catch (SQLException e) {
@@ -73,16 +73,99 @@ public class consulta {
         }//fin try-catch
     }//fin consultar
 
-//TODO
-    public void crearCausa(){ //
+//TODO CREAR MENU PARA SELECCIONAR UNA PERSONA DE LA LISTA DE PERSONAS Y PASAR AQUELLAS SELECCIONADAS A crearCausa
+    //INSERT
+    public boolean crearCausa
+    (String nExpediente,String tipoCausa, int Demandante, int Demandado, int Abogado ){
+        String query = "INSERT INTO Causas"
+                + " (nExpediente, tipoCausa, estado, fechaInicio, idDemandante, idDemandado, idAbogado)" +
+                " VALUES (?, ?, TRUE, CURRENT_DATE, ?, ?, ?)";
+        try{
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setString(1, nExpediente); //nExpediente
+            statement.setString(2, tipoCausa); //tipo causa
+            statement.setInt(3, Demandante); //demandante
+            statement.setInt(4, Demandado); //demandado
+            statement.setInt(5, Abogado); //abogado
 
+            int respuesta = statement.executeUpdate();
+            statement.close();
+
+            System.out.println("Exito!");
+
+            return respuesta > 0;
+        }catch(SQLException e){
+            System.out.println("Error: "+e.getMessage());
+            return false;
+        }//fin  try-catch
     }//fin crearCausa
-//TODO
+    public boolean crearPersona
+            (String nombre, String apellido, String dni, String direccion, String telefono, String email) {
+        String query = "INSERT INTO Personas"
+                + " (nombre, apellido, dni, direccion, telefono, email)" +
+                " VALUES (?, ?, ?, ?, ?, ?)";
+        try{
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setString(1, nombre); //nombre
+            statement.setString(2, apellido); //apellido
+            statement.setString(3, dni); //dni
+            statement.setString(4, direccion); //direccion
+            statement.setString(5, telefono); //telefono
+            statement.setString(6, email); //email
+
+            int respuesta = statement.executeUpdate();
+            statement.close();
+
+            return respuesta > 0;
+        }catch (SQLException e) {
+            System.out.println("Error: "+e.getMessage());
+            return false;}
+    }//fin crear persona
+    public boolean crearAbogado(int idMatricula, int idPersona){
+        String query = "INSERT INTO Abogados"
+                + " (idMatricula, idPersona)" +
+                " VALUES (?,?)";
+        try {
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setInt(1, idMatricula);
+            statement.setInt(2, idPersona);
+
+            int respuesta = statement.executeUpdate();
+            statement.close();
+
+            return respuesta > 0;
+        } catch (SQLException e) {
+            System.out.println("Error: "+e.getMessage());
+            return false;}//fin try-catch
+    }//fin crear persona
+    public boolean crearDocumento(int idCausa, String tipoDocumento, String rutaArchivo){
+        String query = "INSERT INTO Documentos"
+                + " (idCausa, tipoDocumento, rutaArchivo, fechaPresentacion)" +
+                " VALUES (?, ?, ?, CURRENT_DATE)";
+        try {
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setInt(1, idCausa);
+            statement.setString(2, tipoDocumento);
+            statement.setString(3, rutaArchivo);
+
+            int respuesta = statement.executeUpdate();
+            statement.close();
+
+            return respuesta > 0;
+        }catch (SQLException e){
+            System.out.println("Error: "+e.getMessage());
+            return false;
+        }//fin try-catch
+    }//fin  crear documento
+
+    //TODO
+    //UPDATE
     public void editarCausa(){
 
     }//fin editarCausa
 
     // https://docs.oracle.com/javase/tutorial/jdbc/basics/prepared.html
+    //DELETE
     public boolean borrar(String tabla,int idCausa){
         //Comprobar que la tabla a borrar es valida
         if( !tabla.equals("Causas") && !tabla.equals("Documentos") ){

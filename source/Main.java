@@ -22,7 +22,7 @@ public class Main extends Application{
         stage.setTitle("Gestor de Causas <La Ley>");
         stage.show();
 
-
+    //TODO MENSAJE DE ERROR AL FALLAR LA CONEXION/INTENTO DE LOGIN
 //        Label estatus = new Label("Conectando con la base de datos...");
 //        consulta query = logIn.getQuery();
 //        if (query.getEstadoConexion()) { //true
