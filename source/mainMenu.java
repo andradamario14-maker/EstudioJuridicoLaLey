@@ -29,7 +29,7 @@ public class mainMenu {
         listaResultados.getItems().addAll(resultados);
     }//fin buscar
 
-    public void crearPersona(){ //mostramos ventana emergente con el formulario de crear persona
+    public void crearPersona(){ //mostramos ventanas emergentes con el formulario
         FXMLLoader  loader = new FXMLLoader(getClass().getResource("persona.fxml"));
         try {
             Parent root = loader.load();
@@ -42,9 +42,49 @@ public class mainMenu {
         } catch (IOException e){
             System.out.println("Error : "+e.getMessage());
         }//fin try-catch
-
-
     }//fin crearPersona
+
+    public void editarPersona(){ //mostramos ventanas emergentes con el formulario
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("persona.fxml"));
+        try {
+            Parent root = loader.load();
+            Stage ventanaEmergente = new Stage();
+            ventanaEmergente.setTitle("Editar Registro");
+            Scene scene = new Scene(root);
+            ventanaEmergente.setScene(scene);
+            ventanaEmergente.show();
+            //TODO AÑADIR FUNCION PARA DISTINGUIR ENTRE CREAR  Y EDITAR
+            // (RELLENANDO LOS CAMPOS CON LA INFORMACION YA EXISTENTE)
+        } catch (IOException e){
+            System.out.println("Error : "+e.getMessage());
+        }//fin try-catch
+
+    }//fin editarPersona
+
+    public void crearCausa(){ //mostramos ventanas emergentes con el formulario
+        FXMLLoader  loader = new FXMLLoader(getClass().getResource("causa.fxml"));
+        try {
+            Parent root = loader.load();
+            Stage ventanaEmergente = new Stage();
+            ventanaEmergente.setTitle("Registrar Nueva Causa");
+            Scene scene = new Scene(root);
+            ventanaEmergente.setScene(scene);
+            ventanaEmergente.show();
+
+        } catch (IOException e){
+            System.out.println("Error : "+e.getMessage());
+        }//fin try-catch
+
+    }//fin crear causa
+
+    public void editarCausa(){ //mostramos ventanas emergentes con el formulario
+
+    }//fin editarCausa
+
+    public void adjuntarDocumento(){
+
+    }//fin crear causa
+
 
 
     //TODO AÑADIR UN BOTON QUE TE DEJE REGRESAR A LA PANTALLA DE LOG-IN PARA CAMBIAR DE CUENTA

@@ -24,7 +24,7 @@
             <Line endX="494.0" layoutX="104.0" layoutY="61.0" startX="-105.0" />
             <MenuButton fx:id="menuRegistrar" alignment="CENTER" layoutX="8.0" layoutY="107.0" mnemonicParsing="false" prefHeight="68.0" prefWidth="160.0" text="Nuevo Registro">
               <items>
-                <MenuItem fx:id="nuevaCausa" mnemonicParsing="false" text="Registrar Causa" />
+                <MenuItem fx:id="crearCausa" mnemonicParsing="false" onAction="#crearCausa" text="Registrar Causa" />
                 <MenuItem fx:id="nuevaPersona" mnemonicParsing="false" onAction="#crearPersona" text="Registrar Persona" />
               </items>
             </MenuButton>

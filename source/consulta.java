@@ -73,7 +73,6 @@ public class consulta {
         }//fin try-catch
     }//fin consultar
 
-//TODO CREAR MENU PARA SELECCIONAR UNA PERSONA DE LA LISTA DE PERSONAS Y PASAR AQUELLAS SELECCIONADAS A crearCausa
     //INSERT
     public boolean crearCausa
     (String nExpediente,String tipoCausa, int Demandante, int Demandado, int Abogado ){
@@ -84,7 +83,7 @@ public class consulta {
             PreparedStatement statement = conexion.prepareStatement(query);
             statement.setString(1, nExpediente); //nExpediente
             statement.setString(2, tipoCausa); //tipo causa
-            statement.setInt(3, Demandante); //demandante
+            statement.setInt(3, Demandante); //demandante (Actor)
             statement.setInt(4, Demandado); //demandado
             statement.setInt(5, Abogado); //abogado
 
