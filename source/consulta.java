@@ -34,7 +34,7 @@ public class consulta {
     public boolean getEstadoConexion() { return estadoConexion; }
 
     //SELECT
-    public ArrayList<String> consultar(String nombre){
+    public ArrayList<String> consultarCausas(String nombre){
         //consulta SQL
         String query = "SELECT C.idCausa, C.nExpediente, ND.nombre AS Demandante, NDM.nombre AS Demandado, NA.nombre AS Abogado" +
                 " FROM Causas C JOIN Personas ND ON C.idDemandante = ND.idPersona" + //ND Nombre Demandante
@@ -71,7 +71,49 @@ public class consulta {
             //en caso de que haya fallado, retornamos null
             return null;
         }//fin try-catch
-    }//fin consultar
+    }//fin consultarCausas
+
+    public int consultarDni(String dni){
+        String query = "SELECT idPersona FROM Personas WHERE dni = ?";
+        try{
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setString(1,dni);
+            ResultSet respuesta = statement.executeQuery();
+            statement.close();
+
+            //revisamos resultado
+            if (respuesta.next()) { //encontramos resultado
+                return respuesta.getInt("idPersona");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: "+ e.getMessage()); //diagnostico
+            //en caso de que haya fallado, retornamos valor imposible como señal de error
+            return -2;
+        }
+        //si llegamos aquí entonces no encontró a nadie
+        return -1;  //reservamos -1 como indicador de que no se encontro nada (y sin errores)
+    }//fin consultarPersonas
+    public int consultarMatricula(String dni) {
+        String query = "SELECT A.idMatricula FROM Abogados A JOIN Personas P ON A.idPersona = P.idPersona" +
+                " WHERE P.dni = ?";
+        try{
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setString(1,dni);
+            ResultSet respuesta = statement.executeQuery();
+            statement.close();
+
+            //revisamos resultado
+            if (respuesta.next()) { //encontramos resultado
+                return respuesta.getInt("idMatricula");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: "+ e.getMessage()); //diagnostico
+            //en caso de que haya fallado, retornamos valor imposible como señal de error
+            return -2;
+        }
+        //si llegamos aquí entonces no encontró a nadie
+        return -1;  //reservamos -1 como indicador de que no se encontro nada (sin errores)
+    }//fin consultarMatricula
 
     //INSERT
     public boolean crearCausa

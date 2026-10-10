@@ -1,5 +1,5 @@
 import javafx.fxml.FXML;
-import java.awt.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -20,7 +20,7 @@ public class mainMenu {
     //metodos
     public void buscar(){ //se recibe la entrada de la barra de busqueda y retorna resultados
         String nombre = campoBusqueda.getText();
-        ArrayList<String> resultados = conexion.consultar(nombre);
+        ArrayList<String> resultados = conexion.consultarCausas(nombre);
         if (resultados == null) {
             System.out.println("Error al recibir resultados de busqueda"); //diagnostico
             return;
