@@ -8,15 +8,22 @@ CREATE TABLE IF NOT EXISTS `Personas` (
 	`email` varchar(100) NOT NULL,
 	PRIMARY KEY (`idPersona`)
 );
+-- noinspection SpellCheckingInspection
 CREATE TABLE IF NOT EXISTS `Causas` (
 	`idCausa` int UNSIGNED AUTO_INCREMENT NOT NULL UNIQUE,
 	`nExpediente` varchar(50) NOT NULL UNIQUE,
 	`tipoCausa` varchar(50) NOT NULL,
-	`estado` boolean NOT NULL,
+	`estado` tinyint NOT NULL,
 	`fechaInicio` date NOT NULL,
 	`idDemandante` int UNSIGNED NOT NULL,
 	`idDemandado` int UNSIGNED NOT NULL,
 	`idAbogado` int UNSIGNED NOT NULL,
+    `juzgado` varchar(100) NOT NULL,
+    `caratula` varchar(255) NOT NULL,
+    `fechaSentencia` date,
+    `nSentencia` varchar(50),
+    `sentencia` TEXT,
+    `resultado` TEXT,
 	PRIMARY KEY (`idCausa`)
 );
 CREATE TABLE IF NOT EXISTS `Documentos` (

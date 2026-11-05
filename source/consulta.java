@@ -28,15 +28,17 @@ public class consulta {
         }//fin for
 
         //si el ciclo for termina y fue imposible conectarse a la DB como localhost o mediante LAN
-        //estadoConexion queda en false y el mensaje de error se muestra en main (por la ventana de javaFX)
+        //estadoConexion queda false y el mensaje de error se muestra en main (por la ventana de javaFX)
     }//fin constructor
 
     public boolean getEstadoConexion() { return estadoConexion; }
 
     //SELECT
+    //recibe el nombre de una persona y retorna todas las causas a las que pertenece (EN CUALQUIER ROL)
     public ArrayList<String> consultarCausas(String nombre){
         //consulta SQL
-        String query = "SELECT C.idCausa, C.nExpediente, ND.nombre AS Demandante, NDM.nombre AS Demandado, NA.nombre AS Abogado" +
+        String query =
+                "SELECT C.idCausa, C.nExpediente, ND.nombre AS Demandante, NDM.nombre AS Demandado, NA.nombre AS Abogado" +
                 " FROM Causas C JOIN Personas ND ON C.idDemandante = ND.idPersona" + //ND Nombre Demandante
                                 " JOIN Personas NDM ON C.idDemandado = NDM.idPersona" + //NDM NombreDeMandado
                                 " JOIN Abogados A ON C.idAbogado = A.idMatricula" + //A Abogado
@@ -54,12 +56,16 @@ public class consulta {
             //recibimos las tuplas resultantes
             ArrayList<String> results = new ArrayList<>();
             ResultSet resultados = statement.executeQuery();
-            //las volvemos un objeto de  java, será manejado por la funcion que lo llamó
 
-            while(resultados.next()){
+            //las volvemos un objeto de java, será manejado por la funcion que lo llamó
+            //TODO me doy cuenta que debería haber creado una clase "causa" y almacenar todo esto mediante atributos
+            //TODO adaptar la output y el procesamiento para que utilize la nueva  clase ObjCausa
+
+            while(resultados.next()){ //damos formato a la información para una ListView
                 String tupla = resultados.getString("nExpediente")
                         + " | " + resultados.getString("Demandante")
-                        + " vs " + resultados.getString("Demandado");
+                        + " vs " + resultados.getString("Demandado")
+                        + " | id: " + resultados.getInt("idCausa");
                 results.add(tupla);
             }
             resultados.close(); //realizar muchas consultas terminaba con una falta de recursos, hay que cerrarlos
@@ -73,6 +79,52 @@ public class consulta {
         }//fin try-catch
     }//fin consultarCausas
 
+    //recibe la idCausa de una causa y retorna todos los campos de esa tupla en forma de objeto
+    public ObjCausa obtenerCausa(int idCausa){
+        //consulta SQL
+        String query = "SELECT C.*, D.nombre AS nombreDemandante, D.apellido AS apellidoDemandante," +
+                " DM.nombre AS nombreDemandado, DM.apellido AS apellidoDemandado, A.idMatricula" +
+                " FROM Causas C JOIN Personas D ON C.idDemandante = D.idPersona" +
+                " JOIN Personas DM ON C.idDemandado = DM.idPersona" +
+                " JOIN Abogados A ON C.idAbogado = A.idMatricula" +
+                " WHERE C.idCausa = ?";
+        try {
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setInt(1, idCausa);
+            ResultSet resultado = statement.executeQuery();
+
+            //creamos objeto causa y rellenamos el constructor
+            //actualmente solo uso los nombres y apellidos para un único campo, por lo que los combino aquí
+            //de ser necesario más adelante, solo debo cambiar la clase y el constructor
+            if (resultado.next()){
+                String actor = resultado.getString("nombreDemandante")+" "
+                        +resultado.getString("apellidoDemandante");
+                String demandado = resultado.getString("nombreDemandado")+" "
+                        +resultado.getString("apellidoDemandado");
+
+                ObjCausa causa = new ObjCausa
+                        (resultado.getInt("idCausa"),resultado.getString("nExpediente"),
+                                resultado.getString("tipoCausa"), resultado.getBoolean("estado"),
+                                resultado.getString("fechaInicio"), actor,
+                                resultado.getInt("idDemandante"), demandado,
+                                resultado.getInt("idDemandado"),resultado.getInt("idMatricula"),
+                                resultado.getString("juzgado"), resultado.getString("caratula"),
+                                resultado.getString("fechaSentencia"), resultado.getString("nSentencia"),
+                                resultado.getString("sentencia"),resultado.getString("resultado"));
+                resultado.close();
+                statement.close();
+                return causa;
+            }
+            return null;
+        } catch (SQLException e) {
+            System.out.println("Error: "+ e.getMessage()); //diagnostico
+            //en caso de que haya fallado, retornamos null
+            return null;
+        }
+
+    }//fin obtenerCausa
+
+    //Retorna el idPersona del DNI ingresado
     public int consultarDni(String dni){
         String query = "SELECT idPersona FROM Personas WHERE dni = ?";
         try{
@@ -91,8 +143,9 @@ public class consulta {
             return -2;
         }
         //si llegamos aquí entonces no encontró a nadie
-        return -1;  //reservamos -1 como indicador de que no se encontro nada (y sin errores)
+        return -1;  //reservamos -1 como indicador de que no se encontró nada (y sin errores)
     }//fin consultarPersonas
+    //retorna el idMatricula del dni ingresado
     public int consultarMatricula(String dni) {
         String query = "SELECT A.idMatricula FROM Abogados A JOIN Personas P ON A.idPersona = P.idPersona" +
                 " WHERE P.dni = ?";
@@ -112,10 +165,11 @@ public class consulta {
             return -2;
         }
         //si llegamos aquí entonces no encontró a nadie
-        return -1;  //reservamos -1 como indicador de que no se encontro nada (sin errores)
+        return -1;  //reservamos -1 como indicador de que no se encontró nada (sin errores)
     }//fin consultarMatricula
 
     //INSERT
+    //añadimos la causa a la tabla de la DB
     public boolean crearCausa
     (String nExpediente,String tipoCausa, int Demandante, int Demandado, int Abogado ){
         String query = "INSERT INTO Causas"
@@ -132,7 +186,7 @@ public class consulta {
             int respuesta = statement.executeUpdate();
             statement.close();
 
-            System.out.println("Exito!");
+            System.out.println("Éxito!");
 
             return respuesta > 0;
         }catch(SQLException e){
@@ -140,6 +194,7 @@ public class consulta {
             return false;
         }//fin  try-catch
     }//fin crearCausa
+    //añadimos la persona a la tabla de la DB
     public boolean crearPersona
             (String nombre, String apellido, String dni, String direccion, String telefono, String email) {
         String query = "INSERT INTO Personas"
@@ -162,6 +217,7 @@ public class consulta {
             System.out.println("Error: "+e.getMessage());
             return false;}
     }//fin crear persona
+    //añadimos al abogado a la tabla de la DB
     public boolean crearAbogado(int idMatricula, int idPersona){
         String query = "INSERT INTO Abogados"
                 + " (idMatricula, idPersona)" +
@@ -179,6 +235,7 @@ public class consulta {
             System.out.println("Error: "+e.getMessage());
             return false;}//fin try-catch
     }//fin crear persona
+    //añadimos el filepath del archivo a la tabla de la DB
     public boolean crearDocumento(int idCausa, String tipoDocumento, String rutaArchivo){
         String query = "INSERT INTO Documentos"
                 + " (idCausa, tipoDocumento, rutaArchivo, fechaPresentacion)" +
@@ -197,12 +254,27 @@ public class consulta {
             System.out.println("Error: "+e.getMessage());
             return false;
         }//fin try-catch
-    }//fin  crear documento
+    }//fin crear documento
 
-    //TODO
     //UPDATE
-    public void editarCausa(){
+    //recibe la información de todos los campos editables y la actualiza en la DB
+    public boolean editarCausa(String fechaSentencia, String nSentencia, String sentencia, String resultado, int idCausa){
+        String query = "UPDATE Causas SET" +
+                " fechaSentencia = ?, nSentencia = ?, sentencia = ?, resultado = ? WHERE idCausa = ?";
+        try {
+            PreparedStatement statement = conexion.prepareStatement(query);
+            statement.setString(1, fechaSentencia);
+            statement.setString(2, nSentencia);
+            statement.setString(3, sentencia);
+            statement.setString(4, resultado);
+            statement.setInt(5, idCausa);
 
+            int respuesta = statement.executeUpdate();
+            statement.close();
+            return respuesta > 0;
+        } catch (SQLException e) {
+            System.out.println("Error: "+e.getMessage());
+            return false;}//fin try-catch
     }//fin editarCausa
 
     // https://docs.oracle.com/javase/tutorial/jdbc/basics/prepared.html
@@ -220,13 +292,12 @@ public class consulta {
             PreparedStatement statement = conexion.prepareStatement(query);
             statement.setInt(1,idCausa); //.setInt(posición a reemplazar, valor a usar)
 
-
             //resultado de la query
             int respuesta = statement.executeUpdate(); //Update nos dice cuantas tablas fueron afectadas
             statement.close(); //cerramos
             System.out.println("Borrado exitoso!"); //diagnostico
 
-            return (respuesta > 0); //si la comparación da TRUE o FALSE sabemos si una o mas tuplas fueron afectadas o no
+            return (respuesta > 0); //si la comparación da TRUE o FALSE sabemos si una o más tuplas fueron afectadas o no
         } catch (SQLException e) {
 
             System.out.println("No se pudo realizar el borrado: " + e.getMessage()); //diagnostico

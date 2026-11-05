@@ -8,11 +8,14 @@ import javafx.scene.control.TextField;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 
 public class formularioCausa {
 
     //atributos
     private consulta conexion = logIn.getQuery();
+    private ObjCausa infoCausa;
 
     @FXML private TextField campoActor;
     @FXML private TextField campoDemandado;
@@ -30,10 +33,12 @@ public class formularioCausa {
     @FXML private TextArea campoResultado;
     @FXML private TextField campoFechaSentencia;
     @FXML private TextField campoNsentencia;
-    @FXML private Button botonAdjuntar;
+
+    @FXML private Button botonAdjuntar; //TODO
     @FXML private Button botonGuardar;
+    @FXML private Button botonBorrar;
 
-
+    private boolean modoEdicion = false;
 
     public void seleccionarTipo(ActionEvent event){
 
@@ -44,6 +49,8 @@ public class formularioCausa {
     }//fin seleccionarTipo
 
     public void guardar() {
+
+        if (!modoEdicion){ //modo edición = false
 
         //obtener primero los nombres correspondientes a los DNI ingresados y revisar que existen
         int idDemandante = conexion.consultarDni(campoActor.getText()); //obtenemos idDemandante
@@ -81,16 +88,77 @@ public class formularioCausa {
             //TODO mostrarlo como mensaje en pantalla
 
         }
-
-
         boolean resultado = conexion.crearCausa
                 (campoNexpediente.getText(), tipoCausa, idDemandante, idDemandado, idAbogado);
         if (resultado) {
+            System.out.println("Éxito en guardar"); //diagnostico
             Stage ventana = (Stage) botonGuardar.getScene().getWindow();
             ventana.close();
-        }//fin if
+        }
+        } else { //modo edición = true
 
+            boolean resultado = conexion.editarCausa
+                    (campoFechaSentencia.getText(), campoNsentencia.getText(), campoSentencia.getText(),
+                            campoResultado.getText(), infoCausa.getIdCausa());
+            if (resultado) {
+                System.out.println("Éxito en editar"); //diagnostico
+                Stage ventana = (Stage) botonGuardar.getScene().getWindow();
+                ventana.close();
+            }
+        }
     }//fin guardar
 
+    public void adjuntar(){
 
-}
+    }//fin adjuntar
+
+    public void borrar(){
+        if (modoEdicion){
+            boolean resultado = conexion.borrar("Causas", infoCausa.getIdCausa());
+            if (resultado) {
+                System.out.println("Éxito en borrar");
+                Stage ventana = (Stage) botonBorrar.getScene().getWindow();
+                ventana.close();
+            }
+        }
+    }//fin borrar
+
+    //recibe id de la tupla y rellena los campos del formulario
+    public void llenarCampos(int idCausa){
+        modoEdicion = true; //actualizamos el modo
+        //obtenemos la información de la causa
+         infoCausa = conexion.obtenerCausa(idCausa);
+
+        //rellenamos y bloqueamos edición de campos que no requieren ser editados
+        campoActor.setText(infoCausa.getNombreActor()); campoActor.setEditable(false);
+        campoDemandado.setText(infoCausa.getNombreDemandado()); campoDemandado.setEditable(false);
+        campoNexpediente.setText(infoCausa.getnExpediente()); campoNexpediente.setEditable(false);
+        campoAbogado.setText(String.valueOf(infoCausa.getMatriculaAbogado()));
+        campoJuzgado.setText(infoCausa.getJuzgado()); campoJuzgado.setEditable(false);
+        selectorTipo.setText(infoCausa.getTipoCausa()); selectorTipo.setDisable(true);
+        campoCaratula.setText(infoCausa.getCaratula()); campoCaratula.setEditable(false);
+        campoSentencia.setText(infoCausa.getSentencia());
+        campoFechaInicio.setText(infoCausa.getFechaInicio()); campoFechaInicio.setEditable(false);
+        campoResultado.setText(infoCausa.getResultado());
+        campoFechaSentencia.setText(infoCausa.getFechaSentencia());
+        campoNsentencia.setText(infoCausa.getnSentencia());
+
+
+        if(!campoNsentencia.getText().isBlank() && !campoFechaSentencia.getText().isBlank() &&
+                !campoResultado.getText().isBlank() &&
+                !campoSentencia.getText().isBlank()){ //todos están rellenos
+            campoSentencia.setEditable(false);
+            campoResultado.setEditable(false);
+            campoFechaSentencia.setEditable(false);
+            campoNsentencia.setEditable(false);
+            botonGuardar.setDisable(true);
+            botonAdjuntar.setDisable(true);
+        }
+
+        //listaDocumentos.setText(); //TODO IMPLEMENTAR ADJUNTAR DOCUMENTO PARA POBLAR ESTA SECCION
+        //(QUIZA REQUIERE MODIFICAR ObjCausa)
+
+
+    }//fin llenar campos
+
+}//fin clase

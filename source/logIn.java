@@ -19,7 +19,7 @@ public class logIn {
     private static consulta query;
 
     //metodos
-    @FXML private void ingresar(){
+    public void ingresar(){
         //tomamos la entrada del usuario
         String usuario = campoUsuario.getText();
         String contraseña = campoContraseña.getText();
@@ -30,16 +30,16 @@ public class logIn {
             System.out.println("Conexion exitosa!"); //diagnostico
             //pasamos a la pantalla principal
             FXMLLoader loader = new FXMLLoader(getClass().getResource("menu.fxml"));
-            try { //TODO
+            try {
                 Parent root = loader.load();
                 Scene menu = new Scene(root);
                 Stage ventana = (Stage) botonIngresar.getScene().getWindow();
                 ventana.setScene(menu);
                 ventana.show();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                System.out.println(e.getMessage()); //diagnostico
             }//fin try-catch
-        } else {
+        } else { //TODO que se muestre en pantalla tambien, no solo en consola
             System.out.println("Conexion fallida"); //diagnostico
         };//fin if-else
     }//fin ingresar

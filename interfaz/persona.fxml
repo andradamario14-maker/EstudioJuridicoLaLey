@@ -5,7 +5,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Text?>
 
-
 <AnchorPane prefHeight="154.0" prefWidth="542.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="formularioPersona">
    <children>
       <TextField fx:id="campoNombre" layoutX="83.0" layoutY="17.0" promptText="Nombre de la Persona" />
@@ -21,5 +20,8 @@
       <Text layoutX="284.0" layoutY="66.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Telefono :" />
       <Text layoutX="301.0" layoutY="99.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email :" />
       <Button fx:id="botonGuardar" layoutX="476.0" layoutY="115.0" mnemonicParsing="false" onAction="#guardar" text="Guardar" />
+      <Text layoutX="21.0" layoutY="132.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Matricula :" />
+      <TextField fx:id="campoMatricula" layoutX="83.0" layoutY="115.0" promptText="Matricula del Abogado" />
+      <Text layoutX="236.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="( solo ingresar si esta persona será un abogado )" wrappingWidth="149.0" />
    </children>
 </AnchorPane>
