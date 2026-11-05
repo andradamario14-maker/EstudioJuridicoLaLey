@@ -7,8 +7,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser;
+import java.io.File;
 
-import java.util.ArrayList;
+
 
 
 public class formularioCausa {
@@ -77,7 +79,7 @@ public class formularioCausa {
 
         }
 
-        int idAbogado = conexion.consultarMatricula(campoAbogado.getText());//TODO OBTENER LA ID DEL ABOGADO (mediante matricula o DNI)
+        int idAbogado = conexion.consultarMatricula(campoAbogado.getText());
         if (idAbogado == -1) {
             System.out.println("No existe persona con ese DNI :"+campoAbogado.getText()); //diagnostico
             //TODO mostrarlo como mensaje en pantalla
@@ -88,14 +90,17 @@ public class formularioCausa {
             //TODO mostrarlo como mensaje en pantalla
 
         }
+        //TODO considerar crear la carátula de forma automática usando los nombres de los involucrados
         boolean resultado = conexion.crearCausa
-                (campoNexpediente.getText(), tipoCausa, idDemandante, idDemandado, idAbogado);
+                (campoNexpediente.getText(), tipoCausa, campoCaratula.getText(),
+                        idDemandante, idDemandado, idAbogado);
         if (resultado) {
             System.out.println("Éxito en guardar"); //diagnostico
             Stage ventana = (Stage) botonGuardar.getScene().getWindow();
             ventana.close();
         }
         } else { //modo edición = true
+
 
             boolean resultado = conexion.editarCausa
                     (campoFechaSentencia.getText(), campoNsentencia.getText(), campoSentencia.getText(),
@@ -109,7 +114,19 @@ public class formularioCausa {
     }//fin guardar
 
     public void adjuntar(){
+        //abrimos ventana selectora de archivos
+        FileChooser selectorArchivo = new FileChooser();
+        selectorArchivo.setTitle("Adjuntar Documento");
+        File documento = selectorArchivo.showOpenDialog(botonAdjuntar.getScene().getWindow());
+        //aseguramos que algo fue seleccionado
+        if (documento != null) {
+            String filePath = documento.getAbsolutePath();
+            System.out.println(filePath); //diagnostico
 
+            //añadimos documento a base de datos
+            conexion.crearDocumento(infoCausa.getIdCausa(), infoCausa.getTipoCausa(), filePath);
+
+        }
     }//fin adjuntar
 
     public void borrar(){
@@ -143,7 +160,13 @@ public class formularioCausa {
         campoFechaSentencia.setText(infoCausa.getFechaSentencia());
         campoNsentencia.setText(infoCausa.getnSentencia());
 
+        //rellenamos listView
+        listaDocumentos.getItems().clear();
+        for (String filePath : infoCausa.getDocumentos()) {
+            listaDocumentos.getItems().add(new File(filePath).getName());
+        }
 
+        //comprobamos si la causa ya cerró y de ser asi, bloqueamos edición y adjuntar documentos
         if(!campoNsentencia.getText().isBlank() && !campoFechaSentencia.getText().isBlank() &&
                 !campoResultado.getText().isBlank() &&
                 !campoSentencia.getText().isBlank()){ //todos están rellenos

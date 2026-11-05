@@ -10,6 +10,8 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
+import javafx.scene.control.Button;
+
 
 
 public class mainMenu {
@@ -18,6 +20,7 @@ public class mainMenu {
     private consulta conexion = logIn.getQuery(); //recibimos la conexion a la base de datos creada durante login
     @FXML private TextField campoBusqueda;
     @FXML private ListView<String> listaResultados;
+    @FXML private Button botonVolverLogin;
 
     //metodos
     public void buscar(){ //se recibe la entrada de la barra de busqueda y retorna resultados
@@ -115,16 +118,25 @@ public class mainMenu {
 
     }//fin editarCausa
 
-    public void adjuntarDocumento(){
-
-    }//fin adjuntarDocumento
-
-
-
-    //TODO AÑADIR UN BOTON QUE TE DEJE REGRESAR A LA PANTALLA DE LOG-IN PARA CAMBIAR DE CUENTA
-
     public void volverAlogIn(){
-        //TODO  DEBERÁ TERMINAR LA CONEXION ACTUAL CON LA DB PARA ENTONCES CREAR UNA NUEVA CUANDO SE REALIZE EL NUEVO LOG-IN
+
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("logIn.fxml"));
+        try{
+            Parent root = loader.load();
+
+            //cerramos la conexion
+            conexion.cerrarConexion();
+
+            //mostramos ventana
+            Scene logIn = new Scene(root);
+            Stage ventana = (Stage) botonVolverLogin.getScene().getWindow();
+            ventana.setScene(logIn);
+            ventana.show();
+
+        } catch (IOException e) {
+            System.out.println("Error : "+e.getMessage());
+        }
 
     }//fin volverAlogIn
 }//fin mainMenu

@@ -33,6 +33,16 @@ public class consulta {
 
     public boolean getEstadoConexion() { return estadoConexion; }
 
+    //se usa cuando se vuelve a la pantalla de log-in
+    public void cerrarConexion(){
+        try{
+        conexion.close();
+        System.out.println("Cerrado con éxito");
+        } catch (SQLException e) {
+            System.out.println("Error: "+ e.getMessage()); //diagnostico
+        }
+    }//fin cerrarConexion
+
     //SELECT
     //recibe el nombre de una persona y retorna todas las causas a las que pertenece (EN CUALQUIER ROL)
     public ArrayList<String> consultarCausas(String nombre){
@@ -109,19 +119,35 @@ public class consulta {
                                 resultado.getInt("idDemandante"), demandado,
                                 resultado.getInt("idDemandado"),resultado.getInt("idMatricula"),
                                 resultado.getString("juzgado"), resultado.getString("caratula"),
-                                resultado.getString("fechaSentencia"), resultado.getString("nSentencia"),
+                                resultado.getString("fechaSentencia"),
+                                resultado.getString("nSentencia"),
                                 resultado.getString("sentencia"),resultado.getString("resultado"));
+
+                //obtenemos ahora la lista de documentos
+                //(no debería existir un archivo sin causa en la base de datos)
+                query  = "SELECT rutaArchivo FROM Documentos WHERE idCausa = ?";
+                statement = conexion.prepareStatement(query);
+                statement.setInt(1, idCausa);
+                resultado = statement.executeQuery();
+                ArrayList<String> listaDocumentos = new ArrayList<>();
+                while (resultado.next()) { //rellenamos el array
+                    listaDocumentos.add(resultado.getString("rutaArchivo"));
+                }
+                //entregamos lista al objeto causa
+                causa.setDocumentos(listaDocumentos);
+
+                //cerramos
                 resultado.close();
                 statement.close();
+
                 return causa;
             }
-            return null;
         } catch (SQLException e) {
             System.out.println("Error: "+ e.getMessage()); //diagnostico
             //en caso de que haya fallado, retornamos null
             return null;
         }
-
+        return null; //llegar aquí implica que se falló en la query
     }//fin obtenerCausa
 
     //Retorna el idPersona del DNI ingresado
@@ -171,17 +197,18 @@ public class consulta {
     //INSERT
     //añadimos la causa a la tabla de la DB
     public boolean crearCausa
-    (String nExpediente,String tipoCausa, int Demandante, int Demandado, int Abogado ){
+    (String nExpediente,String tipoCausa, String caratula, int Demandante, int Demandado, int Abogado ){
         String query = "INSERT INTO Causas"
-                + " (nExpediente, tipoCausa, estado, fechaInicio, idDemandante, idDemandado, idAbogado)" +
-                " VALUES (?, ?, TRUE, CURRENT_DATE, ?, ?, ?)";
+                + " (nExpediente, tipoCausa, caratula, estado, fechaInicio, idDemandante, idDemandado, idAbogado)" +
+                " VALUES (?, ?, ?, TRUE, CURRENT_DATE, ?, ?, ?)";
         try{
             PreparedStatement statement = conexion.prepareStatement(query);
-            statement.setString(1, nExpediente); //nExpediente
-            statement.setString(2, tipoCausa); //tipo causa
-            statement.setInt(3, Demandante); //demandante (Actor)
-            statement.setInt(4, Demandado); //demandado
-            statement.setInt(5, Abogado); //abogado
+            statement.setString(1, nExpediente);
+            statement.setString(2, tipoCausa);
+            statement.setString(3, caratula);
+            statement.setInt(4, Demandante);
+            statement.setInt(5, Demandado);
+            statement.setInt(6, Abogado);
 
             int respuesta = statement.executeUpdate();
             statement.close();
@@ -258,7 +285,8 @@ public class consulta {
 
     //UPDATE
     //recibe la información de todos los campos editables y la actualiza en la DB
-    public boolean editarCausa(String fechaSentencia, String nSentencia, String sentencia, String resultado, int idCausa){
+    public boolean editarCausa
+    (String fechaSentencia, String nSentencia, String sentencia, String resultado, int idCausa){
         String query = "UPDATE Causas SET" +
                 " fechaSentencia = ?, nSentencia = ?, sentencia = ?, resultado = ? WHERE idCausa = ?";
         try {

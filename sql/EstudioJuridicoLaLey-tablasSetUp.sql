@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `Causas` (
 CREATE TABLE IF NOT EXISTS `Documentos` (
 	`idDocumento` int UNSIGNED AUTO_INCREMENT NOT NULL UNIQUE,
 	`idCausa` int UNSIGNED NOT NULL,
-	`tipoDocumento` varchar(50) NOT NULL,
+	`tipoDocumento` varchar(100) NOT NULL,
 	`rutaArchivo` varchar(200) NOT NULL,
 	`fechaPresentacion` date NOT NULL,
 	PRIMARY KEY (`idDocumento`)

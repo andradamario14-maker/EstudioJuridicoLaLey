@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class ObjCausa {
     //objeto para almacenar la información de las causas recibidas desde MariaDB
@@ -20,6 +21,7 @@ public class ObjCausa {
     private String nSentencia;
     private String sentencia;
     private String resultado;
+    private ArrayList<String> documentos;
 
     //constructor
 
@@ -127,5 +129,13 @@ public class ObjCausa {
 
     public String getResultado() {
         return resultado;
+    }
+
+    public ArrayList<String> getDocumentos() {
+        return documentos;
+    }
+
+    public void setDocumentos(ArrayList<String> documentos) {
+        this.documentos = documentos;
     }
 }//fin class
